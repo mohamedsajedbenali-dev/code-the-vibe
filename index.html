@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Gallery with Theme Toggle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --hover-shadow: rgba(0, 0, 0, 0.12);
+        }
+
+        .dark-theme {
+            --primary-color: #818cf8;
+            --secondary-color: #a78bfa;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --shadow-color: rgba(0, 0, 0, 0.25);
+            --hover-shadow: rgba(0, 0, 0, 0.35);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .theme-toggle i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .theme-text {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s forwards;
+        }
+
+        .card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px var(--hover-shadow);
+        }
+
+        .card-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .card-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .card-old-price {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-left: 8px;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .card-features li {
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .card-features i {
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+
+        .card-button {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .card-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Premium Product Gallery</h1>
+                <p class="subtitle">Discover our curated collection of premium products with exclusive features</p>
+            </div>
+            <div class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </div>
+        </header>
+
+        <div class="gallery">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80" alt="Smart Watch Pro">
+                    <div class="card-badge">Best Seller</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Smart Watch Pro</h3>
+                    <p class="card-description">Advanced smartwatch with health monitoring, GPS, and 7-day battery life. Perfect for fitness enthusiasts and professionals.</p>
+                    
+                    <div class="card-price">
+                        $249.99 <span class="card-old-price">$299.99</span>
+                    </div>
+                    
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> Heart rate & sleep tracking</li>
+                        <li><i class="fas fa-check"></i> Water resistant up to 50m</li>
+                        <li><i class="fas fa-check"></i> Bluetooth & NFC connectivity</li>
+                    </ul>
+                    
+                    <a href="#" class="card-button">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80" alt="Wireless Headphones">
+                    <div class="card-badge">New Arrival</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Wireless Headphones</h3>
+                    <p class="card-description">Noise-cancelling over-ear headphones with premium sound quality and 30-hour battery life for immersive audio experience.</p>
+                    
+                    <div class="card-price">
+                        $179.99 <span class="card-old-price">$219.99</span>
+                    </div>
+                    
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> Active noise cancellation</li>
+                        <li><i class="fas fa-check"></i> 30-hour battery life</li>
+                        <li><i class="fas fa-check"></i> Touch controls & voice assistant</li>
+                    </ul>
+                    
+                    <a href="#" class="card-button">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-image">
+                    <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=726&q=80" alt="Compact Camera">
+                    <div class="card-badge">Limited Offer</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Compact Camera</h3>
+                    <p class="card-description">High-performance compact camera with 4K video, 20MP sensor, and versatile zoom lens for photography enthusiasts.</p>
+                    
+                    <div class="card-price">
+                        $549.99 <span class="card-old-price">$649.99</span>
+                    </div>
+                    
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> 4K video recording</li>
+                        <li><i class="fas fa-check"></i> 20MP sensor with image stabilization</li>
+                        <li><i class="fas fa-check"></i> 5x optical zoom lens</li>
+                    </ul>
+                    
+                    <a href="#" class="card-button">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Product Gallery &copy; 2023 | All products are for demonstration purposes only</p>
+            <p>Hover over cards to see effects | Click the theme toggle to switch between light and dark mode</p>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const themeText = themeToggle.querySelector('.theme-text');
+        
+        // Check for saved theme or prefer-color-scheme
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const currentTheme = localStorage.getItem('theme');
+        
+        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark-theme');
+            themeIcon.className = 'fas fa-sun';
+            themeText.textContent = 'Light Mode';
+        } else {
+            themeIcon.className = 'fas fa-moon';
+            themeText.textContent = 'Dark Mode';
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            
+            if (document.body.classList.contains('dark-theme')) {
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Light Mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Dark Mode';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Add to cart button functionality
+        const addToCartButtons = document.querySelectorAll('.card-button');
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const productName = this.closest('.card').querySelector('.card-title').textContent;
+                const originalText = this.textContent;
+                
+                this.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
+                this.style.background = '#10b981';
+                
+                // Show a simple notification
+                alert(`${productName} has been added to your cart!`);
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.background = '';
+                }, 2000);
+            });
+        });
+        
+        // Additional hover effects for card features
+        const cardFeatures = document.querySelectorAll('.card-features li');
+        
+        cardFeatures.forEach(feature => {
+            feature.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            feature.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body>
+</html>
